@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { v4 as uuidv4 } from 'uuid';
-import { type Todo, FilterType } from "./types";
-import { TODO_FORM_VALUES } from "./types";
+import type { Todo } from "./types"; // type-only импорт
+import { TODO_FORM_VALUES, FilterType } from "./types"; // обычный импорт для значений
 import {
   Page,
   Container,
