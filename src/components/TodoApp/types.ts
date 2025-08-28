@@ -1,12 +1,14 @@
-export type Todo = {
+export interface Todo {
   id: string;
   text: string;
   completed: boolean;
-};
-
-export enum TODO_FORM_VALUES {
-  TEXT = "text",
 }
+
+export const TODO_FORM_VALUES = {
+  TEXT: "text",
+} as const;
+
+export type TODO_FORM_VALUES_TYPE = typeof TODO_FORM_VALUES[keyof typeof TODO_FORM_VALUES];
 
 export enum FilterType {
   ALL = 'all',
