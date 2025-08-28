@@ -1,11 +1,30 @@
-import { FilterType, type Todo, type TODO_FORM_VALUES } from "./types";
+import { useState } from "react";
+import { useFormik } from "formik";
 import * as Yup from "yup";
+import { v4 as uuidv4 } from 'uuid';
+import { type Todo, FilterType } from "./types";
+import { TODO_FORM_VALUES } from "./types";
+import {
+  Page,
+  Container,
+  Title,
+  InputRow,
+  Input,
+  Button,
+  TodoList,
+  TodoItem,
+  TodoText,
+  DeleteButton,
+  ErrorText,
+  FilterContainer,
+  FilterButton,
+  ClearButton,
+  StatsContainer
+} from "./styles";
 
 interface TodoFormValues {
   [TODO_FORM_VALUES.TEXT]: string;
 }
-
-
 
 export default function TodoApp() {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -154,18 +173,4 @@ export default function TodoApp() {
       </Container>
     </Page>
   );
-}
-
-function useState<T>(arg0: never[]): [any, any] {
-    throw new Error("Function not implemented.");
-}
-
-
-function useFormik<T>(arg0: { initialValues: { text: string; }; validationSchema: Yup.ObjectSchema<{ text: string; }, Yup.AnyObject, { text: undefined; }, "">; validateOnChange: boolean; validateOnBlur: boolean; onSubmit: (values: any, { resetForm }: { resetForm: any; }) => void; }) {
-    throw new Error("Function not implemented.");
-}
-
-
-function uuidv4() {
-    throw new Error("Function not implemented.");
 }
