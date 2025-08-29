@@ -9,19 +9,17 @@ import {
   Container,
   Title,
   InputRow,
+  ToggleAllButton,
   Input,
-  Button,
   TodoList,
   TodoItem,
   TodoText,
-  DeleteButton,
-  ErrorText,
+  Checkbox,
+  Footer,
+  ItemsLeft,
   FilterContainer,
   FilterButton,
-  ClearButton,
-  StatsContainer,
-  EmptyState,
-  Checkbox
+  ClearButton
 } from "./styles";
 
 interface TodoFormValues {
@@ -66,8 +64,9 @@ export default function TodoApp() {
     );
   };
 
-  const deleteTodo = (id: string) => {
-    setTodos(todos.filter((todo: Todo) => todo.id !== id));
+  const toggleAllTodos = () => {
+    const allCompleted = todos.every(todo => todo.completed);
+    setTodos(todos.map(todo => ({ ...todo, completed: !allCompleted })));
   };
 
   const clearCompleted = () => {
@@ -88,14 +87,20 @@ export default function TodoApp() {
   const totalTodos = todos.length;
   const completedTodos = todos.filter((todo: Todo) => todo.completed).length;
   const remainingTodos = totalTodos - completedTodos;
+  const allCompleted = todos.length > 0 && todos.every(todo => todo.completed);
 
   return (
     <Page>
       <Container>
         <Title>What needs to be done?</Title>
 
-        <form onSubmit={formik.handleSubmit}>
-          <InputRow>
+        <InputRow>
+          <ToggleAllButton 
+            allCompleted={allCompleted}
+            onClick={toggleAllTodos}
+            type="button"
+          />
+          <form onSubmit={formik.handleSubmit} style={{ flex: 1, display: 'flex' }}>
             <Input
               type="text"
               name={TODO_FORM_VALUES.TEXT}
@@ -103,85 +108,58 @@ export default function TodoApp() {
               value={formik.values[TODO_FORM_VALUES.TEXT]}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              hasError={!!(formik.touched[TODO_FORM_VALUES.TEXT] &&
-                formik.errors[TODO_FORM_VALUES.TEXT])}
             />
-            <Button
-              type="submit"
-              disabled={!formik.isValid || formik.isSubmitting}
-            >
-              Add
-            </Button>
-          </InputRow>
+          </form>
+        </InputRow>
 
-          {formik.touched[TODO_FORM_VALUES.TEXT] &&
-            formik.errors[TODO_FORM_VALUES.TEXT] && (
-              <ErrorText>{formik.errors[TODO_FORM_VALUES.TEXT]}</ErrorText>
-            )}
-        </form>
-
-        {/* Фильтры */}
-        <FilterContainer>
-          <FilterButton 
-            active={filter === FilterType.ALL}
-            onClick={() => setFilter(FilterType.ALL)}
-          >
-            All ({totalTodos})
-          </FilterButton>
-          <FilterButton 
-            active={filter === FilterType.ACTIVE}
-            onClick={() => setFilter(FilterType.ACTIVE)}
-          >
-            Active ({remainingTodos})
-          </FilterButton>
-          <FilterButton 
-            active={filter === FilterType.COMPLETED}
-            onClick={() => setFilter(FilterType.COMPLETED)}
-          >
-            Completed ({completedTodos})
-          </FilterButton>
-        </FilterContainer>
-
-        {/* Список задач */}
         <TodoList>
-          {filteredTodos.length === 0 ? (
-            <EmptyState>
-              {filter === FilterType.ALL 
-                ? "No tasks. Add your first task!" 
-                : filter === FilterType.ACTIVE 
-                ? "No active tasks" 
-                : "No completed tasks"}
-            </EmptyState>
-          ) : (
-            filteredTodos.map((todo: Todo) => (
-              <TodoItem key={todo.id}>
-                <Checkbox completed={todo.completed} />
-                <TodoText
-                  completed={todo.completed}
-                  onClick={() => toggleTodo(todo.id)}
-                >
-                  {todo.text}
-                </TodoText>
-                <DeleteButton onClick={() => deleteTodo(todo.id)}>
-                  Delete
-                </DeleteButton>
-              </TodoItem>
-            ))
-          )}
+          {filteredTodos.map((todo: Todo) => (
+            <TodoItem key={todo.id}>
+              <Checkbox
+                completed={todo.completed}
+                onClick={() => toggleTodo(todo.id)}
+              />
+              <TodoText completed={todo.completed}>
+                {todo.text}
+              </TodoText>
+            </TodoItem>
+          ))}
         </TodoList>
 
-        {/* Статистика и очистка */}
         {todos.length > 0 && (
-          <StatsContainer>
-            <div>
-              <strong>{remainingTodos}</strong> {remainingTodos === 1 ? 'item left' : 'items left'}
-            </div>
-            {completedTodos > 0 && (
-              <ClearButton onClick={clearCompleted}>
-                Clear completed ({completedTodos})
-              </ClearButton>
-            )}
-          </StatsContainer>
+          <Footer>
+            <ItemsLeft>
+              {remainingTodos} {remainingTodos === 1 ? 'item' : 'items'} left
+            </ItemsLeft>
+            
+            <FilterContainer>
+              <FilterButton 
+                active={filter === FilterType.ALL}
+                onClick={() => setFilter(FilterType.ALL)}
+              >
+                All
+              </FilterButton>
+              <FilterButton 
+                active={filter === FilterType.ACTIVE}
+                onClick={() => setFilter(FilterType.ACTIVE)}
+              >
+                Active
+              </FilterButton>
+              <FilterButton 
+                active={filter === FilterType.COMPLETED}
+                onClick={() => setFilter(FilterType.COMPLETED)}
+              >
+                Completed
+              </FilterButton>
+            </FilterContainer>
+
+            <ClearButton 
+              onClick={clearCompleted}
+              disabled={completedTodos === 0}
+            >
+              Clear completed
+            </ClearButton>
+          </Footer>
         )}
       </Container>
     </Page>
