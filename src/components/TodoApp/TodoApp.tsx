@@ -29,6 +29,7 @@ interface TodoFormValues {
 export default function TodoApp() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filter, setFilter] = useState<FilterType>(FilterType.ALL);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
   const validationSchema = Yup.object().shape({
     [TODO_FORM_VALUES.TEXT]: Yup.string()
@@ -64,9 +65,8 @@ export default function TodoApp() {
     );
   };
 
-  const toggleAllTodos = () => {
-    const allCompleted = todos.every(todo => todo.completed);
-    setTodos(todos.map(todo => ({ ...todo, completed: !allCompleted })));
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
   };
 
   const clearCompleted = () => {
@@ -87,7 +87,6 @@ export default function TodoApp() {
   const totalTodos = todos.length;
   const completedTodos = todos.filter((todo: Todo) => todo.completed).length;
   const remainingTodos = totalTodos - completedTodos;
-  const allCompleted = todos.length > 0 && todos.every(todo => todo.completed);
 
   return (
     <Page>
@@ -96,8 +95,8 @@ export default function TodoApp() {
 
         <InputRow>
           <ToggleAllButton 
-            allCompleted={allCompleted}
-            onClick={toggleAllTodos}
+            isCollapsed={isCollapsed}
+            onClick={toggleCollapse}
             type="button"
           />
           <form onSubmit={formik.handleSubmit} style={{ flex: 1, display: 'flex' }}>
@@ -112,7 +111,7 @@ export default function TodoApp() {
           </form>
         </InputRow>
 
-        <TodoList>
+        <TodoList isCollapsed={isCollapsed}>
           {filteredTodos.map((todo: Todo) => (
             <TodoItem key={todo.id}>
               <Checkbox
@@ -127,7 +126,7 @@ export default function TodoApp() {
         </TodoList>
 
         {todos.length > 0 && (
-          <Footer>
+          <Footer isCollapsed={isCollapsed}>
             <ItemsLeft>
               {remainingTodos} {remainingTodos === 1 ? 'item' : 'items'} left
             </ItemsLeft>

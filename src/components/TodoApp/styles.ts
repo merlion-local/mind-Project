@@ -13,6 +13,10 @@ interface CheckboxProps {
   completed: boolean;
 }
 
+interface ToggleAllButtonProps {
+  isCollapsed: boolean;
+}
+
 export const Page = styled.div`
   display: flex;
   justify-content: center;
@@ -52,19 +56,20 @@ export const InputRow = styled.div`
   background: #fff;
 `;
 
-export const ToggleAllButton = styled.button<{ allCompleted: boolean }>`
+export const ToggleAllButton = styled.button<ToggleAllButtonProps>`
   width: 30px;
   height: 30px;
   border: 1px solid #e2e8f0;
   border-radius: 0;
-  background: ${props => props.allCompleted ? '#4caf50' : 'transparent'};
-  color: ${props => props.allCompleted ? 'white' : '#a0aec0'};
+  background: transparent;
+  color: #a0aec0;
   font-size: 16px;
   cursor: pointer;
   margin-right: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.2s;
   
   &:hover {
     border-color: #cbd5e0;
@@ -72,8 +77,9 @@ export const ToggleAllButton = styled.button<{ allCompleted: boolean }>`
   
   &::after {
     content: '❯';
-    transform: rotate(90deg);
+    transform: ${props => props.isCollapsed ? 'rotate(0deg)' : 'rotate(90deg)'};
     display: block;
+    transition: transform 0.2s;
   }
 `;
 
@@ -91,10 +97,11 @@ export const Input = styled.input`
   }
 `;
 
-export const TodoList = styled.ul`
+export const TodoList = styled.ul<{ isCollapsed: boolean }>`
   list-style: none;
   padding: 0;
   margin: 0;
+  display: ${props => props.isCollapsed ? 'none' : 'block'};
 `;
 
 export const TodoItem = styled.li`
@@ -115,7 +122,7 @@ export const Checkbox = styled.span<CheckboxProps>`
   width: 24px;
   height: 24px;
   border: 1px solid ${props => props.completed ? '#4caf50' : '#e2e8f0'};
-  border-radius: 0;
+  border-radius: 50%;
   margin-right: 12px;
   position: relative;
   background: ${props => props.completed ? '#4caf50' : 'transparent'};
@@ -141,8 +148,8 @@ export const TodoText = styled.span<TodoTextProps>`
   text-decoration: ${props => props.completed ? 'line-through' : 'none'};
 `;
 
-export const Footer = styled.div`
-  display: flex;
+export const Footer = styled.div<{ isCollapsed: boolean }>`
+  display: ${props => props.isCollapsed ? 'none' : 'flex'};
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
