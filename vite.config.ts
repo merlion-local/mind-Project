@@ -4,6 +4,7 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
+  base:"/mind-Project/",
   server: {
     port: 3000,
     open: true
@@ -18,5 +19,6 @@ export default defineConfig({
     globals: true,
     setupFiles: "./src/test/setup.ts",
     include: ["src/**/*.{test,spec}.{js,jsx,ts,tsx}"],
+    css:true,
   }
 });

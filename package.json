@@ -9,10 +9,11 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",
+    "build:gh": "npm run build && cp dist/index.html dist/404.html",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
-  "homepage": "https://your-username.github.io/todo-app",
+  "homepage": "https://merlion-local.github.io/mind-Project",
   "dependencies": {
     "@emotion/styled": "^11.10.5",
     "formik": "^2.2.9",
@@ -34,4 +35,5 @@
     "vite": "^5.4.19",
     "vitest": "^1.6.1"
   }
+  
 }
