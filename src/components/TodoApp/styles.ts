@@ -1,5 +1,22 @@
 import styled from "@emotion/styled";
 
+// Интерфейсы для пропсов
+interface InputProps {
+  hasError?: boolean;
+}
+
+interface TodoTextProps {
+  completed: boolean;
+}
+
+interface FilterButtonProps {
+  active?: boolean;
+}
+
+interface CheckboxProps {
+  completed: boolean;
+}
+
 export const Page = styled.div`
   display: flex;
   justify-content: center;
@@ -35,7 +52,7 @@ export const InputRow = styled.div`
   margin-bottom: 24px;
 `;
 
-export const Input = styled.input<{ hasError?: boolean }>`
+export const Input = styled.input<InputProps>`
   flex: 1;
   padding: 16px;
   border: 2px solid ${props => props.hasError ? '#e53e3e' : '#e2e8f0'};
@@ -92,7 +109,6 @@ export const TodoList = styled.ul`
 
 export const TodoItem = styled.li`
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 16px;
   border-bottom: 1px solid #e2e8f0;
@@ -107,7 +123,7 @@ export const TodoItem = styled.li`
   }
 `;
 
-export const TodoText = styled.span<{ completed: boolean }>`
+export const TodoText = styled.span<TodoTextProps>`
   flex: 1;
   cursor: pointer;
   text-decoration: ${props => props.completed ? 'line-through' : 'none'};
@@ -115,6 +131,7 @@ export const TodoText = styled.span<{ completed: boolean }>`
   font-size: 16px;
   padding: 4px 0;
   transition: all 0.2s;
+  margin-right: 12px;
 
   &:hover {
     color: ${props => props.completed ? '#a0aec0' : '#4299e1'};
@@ -131,10 +148,12 @@ export const DeleteButton = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  opacity: 0.7;
 
   &:hover {
     background: #c53030;
     transform: scale(1.05);
+    opacity: 1;
   }
 `;
 
@@ -155,7 +174,7 @@ export const FilterContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-export const FilterButton = styled.button<{ active?: boolean }>`
+export const FilterButton = styled.button<FilterButtonProps>`
   padding: 8px 16px;
   background: ${props => props.active ? '#4299e1' : 'transparent'};
   color: ${props => props.active ? 'white' : '#4a5568'};
@@ -208,7 +227,7 @@ export const EmptyState = styled.div`
   font-style: italic;
 `;
 
-export const Checkbox = styled.span<{ completed: boolean }>`
+export const Checkbox = styled.span<CheckboxProps>`
   display: inline-block;
   width: 20px;
   height: 20px;
@@ -218,6 +237,7 @@ export const Checkbox = styled.span<{ completed: boolean }>`
   position: relative;
   background: ${props => props.completed ? '#4299e1' : 'transparent'};
   transition: all 0.2s;
+  flex-shrink: 0;
 
   &::after {
     content: '✓';

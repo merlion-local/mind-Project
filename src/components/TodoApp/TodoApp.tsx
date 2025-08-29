@@ -35,9 +35,9 @@ export default function TodoApp() {
   const validationSchema = Yup.object().shape({
     [TODO_FORM_VALUES.TEXT]: Yup.string()
       .trim()
-      .min(1, "Задача не может быть пустой")
-      .max(100, "Задача слишком длинная")
-      .required("Введите задачу"),
+      .min(1, "Task cannot be empty")
+      .max(100, "Task is too long")
+      .required("Enter a task"),
   });
 
   const formik = useFormik<TodoFormValues>({
@@ -99,7 +99,7 @@ export default function TodoApp() {
             <Input
               type="text"
               name={TODO_FORM_VALUES.TEXT}
-              placeholder="Добавить новую задачу..."
+              placeholder="Add a new task..."
               value={formik.values[TODO_FORM_VALUES.TEXT]}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -110,7 +110,7 @@ export default function TodoApp() {
               type="submit"
               disabled={!formik.isValid || formik.isSubmitting}
             >
-              Добавить
+              Add
             </Button>
           </InputRow>
 
@@ -126,19 +126,19 @@ export default function TodoApp() {
             active={filter === FilterType.ALL}
             onClick={() => setFilter(FilterType.ALL)}
           >
-            Все ({totalTodos})
+            All ({totalTodos})
           </FilterButton>
           <FilterButton 
             active={filter === FilterType.ACTIVE}
             onClick={() => setFilter(FilterType.ACTIVE)}
           >
-            Активные ({remainingTodos})
+            Active ({remainingTodos})
           </FilterButton>
           <FilterButton 
             active={filter === FilterType.COMPLETED}
             onClick={() => setFilter(FilterType.COMPLETED)}
           >
-            Завершенные ({completedTodos})
+            Completed ({completedTodos})
           </FilterButton>
         </FilterContainer>
 
@@ -147,10 +147,10 @@ export default function TodoApp() {
           {filteredTodos.length === 0 ? (
             <EmptyState>
               {filter === FilterType.ALL 
-                ? "Нет задач. Добавьте первую задачу!" 
+                ? "No tasks. Add your first task!" 
                 : filter === FilterType.ACTIVE 
-                ? "Нет активных задач" 
-                : "Нет завершенных задач"}
+                ? "No active tasks" 
+                : "No completed tasks"}
             </EmptyState>
           ) : (
             filteredTodos.map((todo: Todo) => (
@@ -163,7 +163,7 @@ export default function TodoApp() {
                   {todo.text}
                 </TodoText>
                 <DeleteButton onClick={() => deleteTodo(todo.id)}>
-                  Удалить
+                  Delete
                 </DeleteButton>
               </TodoItem>
             ))
