@@ -91,16 +91,17 @@ export default function TodoApp() {
   return (
     <Page>
       <MainTitle>todos</MainTitle>
-      
       <Container>
         <InputRow>
-          <ToggleAllButton 
+          <ToggleAllButton
+            data-testid="toggle-all-button"
             isCollapsed={isCollapsed}
             onClick={toggleCollapse}
             type="button"
           />
           <form onSubmit={formik.handleSubmit} style={{ flex: 1, display: 'flex' }}>
             <Input
+              data-testid="todo-input"
               type="text"
               name={TODO_FORM_VALUES.TEXT}
               placeholder="What needs to be done?"
@@ -111,14 +112,27 @@ export default function TodoApp() {
           </form>
         </InputRow>
 
-        <TodoList isCollapsed={isCollapsed} itemCount={filteredTodos.length}>
+        <TodoList 
+          data-testid="todo-list"
+          isCollapsed={isCollapsed} 
+          itemCount={filteredTodos.length}
+        >
           {filteredTodos.map((todo: Todo, index: number) => (
-            <TodoItem key={todo.id} index={index} totalItems={filteredTodos.length}>
+            <TodoItem 
+              key={todo.id} 
+              index={index}
+              totalItems={filteredTodos.length}
+              data-testid={`todo-item-${index}`}
+            >
               <Checkbox
+                data-testid={`checkbox-${todo.id}`}
                 completed={todo.completed}
                 onClick={() => toggleTodo(todo.id)}
               />
-              <TodoText completed={todo.completed}>
+              <TodoText 
+                data-testid={`todo-text-${todo.id}`}
+                completed={todo.completed}
+              >
                 {todo.text}
               </TodoText>
             </TodoItem>
@@ -126,25 +140,32 @@ export default function TodoApp() {
         </TodoList>
 
         {todos.length > 0 && (
-          <Footer isCollapsed={isCollapsed} hasItems={filteredTodos.length > 0}>
-            <ItemsLeft>
+          <Footer 
+            data-testid="footer"
+            isCollapsed={isCollapsed} 
+            hasItems={filteredTodos.length > 0}
+          >
+            <ItemsLeft data-testid="items-left">
               {remainingTodos} {remainingTodos === 1 ? 'item' : 'items'} left
             </ItemsLeft>
             
-            <FilterContainer>
-              <FilterButton 
+            <FilterContainer data-testid="filter-container">
+              <FilterButton
+                data-testid="filter-all"
                 active={filter === FilterType.ALL}
                 onClick={() => setFilter(FilterType.ALL)}
               >
                 All
               </FilterButton>
-              <FilterButton 
+              <FilterButton
+                data-testid="filter-active"
                 active={filter === FilterType.ACTIVE}
                 onClick={() => setFilter(FilterType.ACTIVE)}
               >
                 Active
               </FilterButton>
-              <FilterButton 
+              <FilterButton
+                data-testid="filter-completed"
                 active={filter === FilterType.COMPLETED}
                 onClick={() => setFilter(FilterType.COMPLETED)}
               >
@@ -152,7 +173,8 @@ export default function TodoApp() {
               </FilterButton>
             </FilterContainer>
 
-            <ClearButton 
+            <ClearButton
+              data-testid="clear-completed"
               onClick={clearCompleted}
               disabled={completedTodos === 0}
             >
