@@ -111,9 +111,9 @@ export default function TodoApp() {
           </form>
         </InputRow>
 
-        <TodoList isCollapsed={isCollapsed}>
-          {filteredTodos.map((todo: Todo) => (
-            <TodoItem key={todo.id}>
+        <TodoList isCollapsed={isCollapsed} itemCount={filteredTodos.length}>
+          {filteredTodos.map((todo: Todo, index: number) => (
+            <TodoItem key={todo.id} index={index} totalItems={filteredTodos.length}>
               <Checkbox
                 completed={todo.completed}
                 onClick={() => toggleTodo(todo.id)}
@@ -126,7 +126,7 @@ export default function TodoApp() {
         </TodoList>
 
         {todos.length > 0 && (
-          <Footer isCollapsed={isCollapsed}>
+          <Footer isCollapsed={isCollapsed} hasItems={filteredTodos.length > 0}>
             <ItemsLeft>
               {remainingTodos} {remainingTodos === 1 ? 'item' : 'items'} left
             </ItemsLeft>

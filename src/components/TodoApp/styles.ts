@@ -38,35 +38,12 @@ export const MainTitle = styled.h1`
 export const Container = styled.div`
   background: white;
   border-radius: 0;
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.2),
-    0 10px 20px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 550px;
   position: relative;
   
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    background: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    z-index: -1;
-  }
-  
-  &::before {
-    height: 5px;
-    bottom: -5px;
-    left: 4px;
-    right: 4px;
-  }
-  
-  &::after {
-    height: 10px;
-    bottom: -10px;
-    left: 8px;
-    right: 8px;
-  }
+  /* Основная тень контейнера */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 `;
 
 export const InputRow = styled.div`
@@ -76,7 +53,7 @@ export const InputRow = styled.div`
   border-bottom: 1px solid #e2e8f0;
   background: #fff;
   position: relative;
-  z-index: 2;
+  z-index: 10;
 `;
 
 export const ToggleAllButton = styled.button<ToggleAllButtonProps>`
@@ -122,26 +99,59 @@ export const Input = styled.input`
   }
 `;
 
-export const TodoList = styled.ul<{ isCollapsed: boolean }>`
+export const TodoList = styled.ul<{ isCollapsed: boolean; itemCount: number }>`
   list-style: none;
   padding: 0;
   margin: 0;
   display: ${props => props.isCollapsed ? 'none' : 'block'};
   position: relative;
-  z-index: 1;
+  
+  /* Эффект стопки - тени для наложения */
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    height: 5px;
+    background: white;
+    z-index: -1;
+    box-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.1),
+      0 0 1px rgba(0, 0, 0, 0.1);
+  }
+  
+  &::before {
+    bottom: ${props => Math.min(props.itemCount * 3, 15)}px;
+    display: ${props => props.itemCount > 0 ? 'block' : 'none'};
+  }
+  
+  &::after {
+    bottom: ${props => Math.min(props.itemCount * 6, 30)}px;
+    display: ${props => props.itemCount > 1 ? 'block' : 'none'};
+  }
 `;
 
-export const TodoItem = styled.li`
+export const TodoItem = styled.li<{ index: number; totalItems: number }>`
   display: flex;
   align-items: center;
   padding: 16px;
   border-bottom: 1px solid #ededed;
   background: #fff;
   position: relative;
+  z-index: ${props => props.totalItems - props.index};
 
   &:last-child {
     border-bottom: none;
+    box-shadow: ${props => props.index === props.totalItems - 1 ? 
+      '0 1px 2px rgba(0, 0, 0, 0.1)' : 'none'};
   }
+
+  /* Эффект тени для элементов стопки */
+  box-shadow: 
+    0 1px 0 rgba(0, 0, 0, 0.03),
+    ${props => props.index < props.totalItems - 1 ? 
+      '0 1px 2px rgba(0, 0, 0, 0.05)' : 'none'};
 `;
 
 export const Checkbox = styled.span<CheckboxProps>`
@@ -176,26 +186,43 @@ export const TodoText = styled.span<TodoTextProps>`
   transition: color 0.3s;
 `;
 
-export const Footer = styled.div<{ isCollapsed: boolean }>`
+export const Footer = styled.div<{ isCollapsed: boolean; hasItems: boolean }>`
   display: ${props => props.isCollapsed ? 'none' : 'flex'};
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
   background: #fff;
-  border-top: 1px solid #e6e6e6;
   color: #777;
   font-size: 14px;
   position: relative;
-  z-index: 0;
+  z-index: 5;
+  min-height: 20px;
+  box-shadow: 
+    0 1px 1px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.1);
   
-  &::before {
+  /* Дополнительные тени для эффекта стопки в футере */
+  &::before,
+  &::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+    left: 2px;
+    right: 2px;
     height: 5px;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, transparent 100%);
+    background: white;
+    z-index: -1;
+    box-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.1),
+      0 0 1px rgba(0, 0, 0, 0.1);
+    display: ${props => props.hasItems ? 'block' : 'none'};
+  }
+  
+  &::before {
+    bottom: -5px;
+  }
+  
+  &::after {
+    bottom: -10px;
   }
 `;
 
@@ -206,6 +233,9 @@ export const ItemsLeft = styled.span`
 export const FilterContainer = styled.div`
   display: flex;
   gap: 4px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 `;
 
 export const FilterButton = styled.button<FilterButtonProps>`
