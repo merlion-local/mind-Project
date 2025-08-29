@@ -43,7 +43,7 @@ export const Container = styled.div`
   position: relative;
   
   /* Основная тень контейнера */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 `;
 
 export const InputRow = styled.div`
@@ -106,29 +106,41 @@ export const TodoList = styled.ul<{ isCollapsed: boolean; itemCount: number }>`
   display: ${props => props.isCollapsed ? 'none' : 'block'};
   position: relative;
   
-  /* Эффект стопки - тени для наложения */
+  /* Усиленные тени для эффекта стопки */
   &::before,
-  &::after {
+  &::after,
+  &::before {
     content: '';
     position: absolute;
-    left: 2px;
-    right: 2px;
-    height: 5px;
+    left: 4px;
+    right: 4px;
+    height: 8px;
     background: white;
     z-index: -1;
     box-shadow: 
-      0 2px 4px rgba(0, 0, 0, 0.1),
-      0 0 1px rgba(0, 0, 0, 0.1);
+      0 3px 10px rgba(0, 0, 0, 0.15),
+      0 1px 3px rgba(0, 0, 0, 0.2);
   }
   
+  /* Первый слой тени */
   &::before {
-    bottom: ${props => Math.min(props.itemCount * 3, 15)}px;
+    bottom: ${props => Math.min(props.itemCount * 4, 20)}px;
     display: ${props => props.itemCount > 0 ? 'block' : 'none'};
+    height: 10px;
+    left: 6px;
+    right: 6px;
   }
   
+  /* Второй слой тени */
   &::after {
-    bottom: ${props => Math.min(props.itemCount * 6, 30)}px;
+    bottom: ${props => Math.min(props.itemCount * 8, 40)}px;
     display: ${props => props.itemCount > 1 ? 'block' : 'none'};
+    height: 12px;
+    left: 8px;
+    right: 8px;
+    box-shadow: 
+      0 4px 15px rgba(0, 0, 0, 0.12),
+      0 2px 5px rgba(0, 0, 0, 0.15);
   }
 `;
 
@@ -143,15 +155,16 @@ export const TodoItem = styled.li<{ index: number; totalItems: number }>`
 
   &:last-child {
     border-bottom: none;
+    /* Более заметная тень для последнего элемента */
     box-shadow: ${props => props.index === props.totalItems - 1 ? 
-      '0 1px 2px rgba(0, 0, 0, 0.1)' : 'none'};
+      '0 2px 8px rgba(0, 0, 0, 0.15)' : 'none'};
   }
 
-  /* Эффект тени для элементов стопки */
+  /* Усиленные тени для элементов стопки */
   box-shadow: 
-    0 1px 0 rgba(0, 0, 0, 0.03),
+    0 2px 4px rgba(0, 0, 0, 0.1),
     ${props => props.index < props.totalItems - 1 ? 
-      '0 1px 2px rgba(0, 0, 0, 0.05)' : 'none'};
+      '0 4px 12px rgba(0, 0, 0, 0.12)' : 'none'};
 `;
 
 export const Checkbox = styled.span<CheckboxProps>`
@@ -197,32 +210,40 @@ export const Footer = styled.div<{ isCollapsed: boolean; hasItems: boolean }>`
   position: relative;
   z-index: 5;
   min-height: 20px;
+  
+  /* Усиленные тени для футера */
   box-shadow: 
-    0 1px 1px rgba(0, 0, 0, 0.1),
-    0 4px 8px rgba(0, 0, 0, 0.1);
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    0 6px 20px rgba(0, 0, 0, 0.1);
   
   /* Дополнительные тени для эффекта стопки в футере */
   &::before,
   &::after {
     content: '';
     position: absolute;
-    left: 2px;
-    right: 2px;
-    height: 5px;
+    left: 6px;
+    right: 6px;
+    height: 10px;
     background: white;
     z-index: -1;
     box-shadow: 
-      0 2px 4px rgba(0, 0, 0, 0.1),
-      0 0 1px rgba(0, 0, 0, 0.1);
+      0 3px 12px rgba(0, 0, 0, 0.15),
+      0 1px 4px rgba(0, 0, 0, 0.1);
     display: ${props => props.hasItems ? 'block' : 'none'};
   }
   
   &::before {
-    bottom: -5px;
+    bottom: -10px;
   }
   
   &::after {
-    bottom: -10px;
+    bottom: -20px;
+    left: 10px;
+    right: 10px;
+    height: 12px;
+    box-shadow: 
+      0 4px 15px rgba(0, 0, 0, 0.12),
+      0 2px 6px rgba(0, 0, 0, 0.1);
   }
 `;
 
@@ -232,39 +253,40 @@ export const ItemsLeft = styled.span`
 
 export const FilterContainer = styled.div`
   display: flex;
-  gap: 4px;
+  gap: 8px;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
 `;
 
 export const FilterButton = styled.button<FilterButtonProps>`
-  padding: 4px 8px;
+  padding: 6px 12px;
   background: transparent;
   color: ${props => props.active ? '#6c6c6c' : '#777'};
-  border: 1px solid ${props => props.active ? 'rgba(175, 47, 47, 0.2)' : 'transparent'};
-  border-radius: 3px;
+  border: 1px solid ${props => props.active ? 'rgba(175, 47, 47, 0.3)' : 'transparent'};
+  border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
   font-weight: 300;
   
   &:hover {
-    border-color: rgba(175, 47, 47, 0.1);
+    border-color: ${props => props.active ? 'rgba(175, 47, 47, 0.3)' : 'rgba(175, 47, 47, 0.1)'};
   }
 `;
 
 export const ClearButton = styled.button`
-  padding: 4px 8px;
+  padding: 6px 12px;
   background: transparent;
   color: #777;
   border: none;
-  border-radius: 3px;
+  border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
   font-weight: 300;
   
   &:hover {
     text-decoration: underline;
+    background: rgba(0, 0, 0, 0.03);
   }
   
   &:disabled {
@@ -273,6 +295,7 @@ export const ClearButton = styled.button`
     
     &:hover {
       text-decoration: none;
+      background: transparent;
     }
   }
 `;
