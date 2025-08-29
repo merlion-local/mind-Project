@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import TodoApp from './components/TodoApp/TodoApp';
+import '@testing-library/jest-dom';
 
 
 // Mock UUID
