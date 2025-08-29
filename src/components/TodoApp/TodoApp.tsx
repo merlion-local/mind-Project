@@ -6,8 +6,8 @@ import type { Todo } from "./types";
 import { TODO_FORM_VALUES, FilterType } from "./types";
 import {
   Page,
+  MainTitle,
   Container,
-  Title,
   InputRow,
   ToggleAllButton,
   Input,
@@ -90,9 +90,9 @@ export default function TodoApp() {
 
   return (
     <Page>
+      <MainTitle>todos</MainTitle>
+      
       <Container>
-        <Title>What needs to be done?</Title>
-
         <InputRow>
           <ToggleAllButton 
             isCollapsed={isCollapsed}
@@ -103,7 +103,7 @@ export default function TodoApp() {
             <Input
               type="text"
               name={TODO_FORM_VALUES.TEXT}
-              placeholder="Add a new task..."
+              placeholder="What needs to be done?"
               value={formik.values[TODO_FORM_VALUES.TEXT]}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
