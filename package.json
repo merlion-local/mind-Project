@@ -8,8 +8,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
+  "homepage": "https://your-username.github.io/todo-app",
   "dependencies": {
     "@emotion/styled": "^11.10.5",
     "formik": "^2.2.9",
