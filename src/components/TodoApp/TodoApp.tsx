@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { v4 as uuidv4 } from 'uuid';
-import type { Todo } from "./types"; // type-only импорт
-import { TODO_FORM_VALUES, FilterType } from "./types"; // обычный импорт для значений
+import type { Todo } from "./types";
+import { TODO_FORM_VALUES, FilterType } from "./types";
 import {
   Page,
   Container,
@@ -19,7 +19,9 @@ import {
   FilterContainer,
   FilterButton,
   ClearButton,
-  StatsContainer
+  StatsContainer,
+  EmptyState,
+  Checkbox
 } from "./styles";
 
 interface TodoFormValues {
@@ -90,14 +92,14 @@ export default function TodoApp() {
   return (
     <Page>
       <Container>
-        <Title>To-Do List</Title>
+        <Title>What needs to be done?</Title>
 
         <form onSubmit={formik.handleSubmit}>
           <InputRow>
             <Input
               type="text"
               name={TODO_FORM_VALUES.TEXT}
-              placeholder="Введите задачу..."
+              placeholder="Добавить новую задачу..."
               value={formik.values[TODO_FORM_VALUES.TEXT]}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -142,30 +144,41 @@ export default function TodoApp() {
 
         {/* Список задач */}
         <TodoList>
-          {filteredTodos.map((todo: Todo) => (
-            <TodoItem key={todo.id}>
-              <TodoText
-                completed={todo.completed}
-                onClick={() => toggleTodo(todo.id)}
-              >
-                {todo.text}
-              </TodoText>
-              <DeleteButton onClick={() => deleteTodo(todo.id)}>
-                Удалить
-              </DeleteButton>
-            </TodoItem>
-          ))}
+          {filteredTodos.length === 0 ? (
+            <EmptyState>
+              {filter === FilterType.ALL 
+                ? "Нет задач. Добавьте первую задачу!" 
+                : filter === FilterType.ACTIVE 
+                ? "Нет активных задач" 
+                : "Нет завершенных задач"}
+            </EmptyState>
+          ) : (
+            filteredTodos.map((todo: Todo) => (
+              <TodoItem key={todo.id}>
+                <Checkbox completed={todo.completed} />
+                <TodoText
+                  completed={todo.completed}
+                  onClick={() => toggleTodo(todo.id)}
+                >
+                  {todo.text}
+                </TodoText>
+                <DeleteButton onClick={() => deleteTodo(todo.id)}>
+                  Удалить
+                </DeleteButton>
+              </TodoItem>
+            ))
+          )}
         </TodoList>
 
         {/* Статистика и очистка */}
         {todos.length > 0 && (
           <StatsContainer>
             <div>
-              Осталось задач: <strong>{remainingTodos}</strong>
+              <strong>{remainingTodos}</strong> {remainingTodos === 1 ? 'item left' : 'items left'}
             </div>
             {completedTodos > 0 && (
               <ClearButton onClick={clearCompleted}>
-                Очистить завершенные ({completedTodos})
+                Clear completed ({completedTodos})
               </ClearButton>
             )}
           </StatsContainer>
