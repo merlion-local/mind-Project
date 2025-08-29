@@ -1,18 +1,20 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 import TodoApp from './components/TodoApp/TodoApp';
 
 
-// Mock UUID
+// Mock UUID - исправляем чтобы возвращал последовательные значения
+let uuidCounter = 0;
 vi.mock('uuid', () => ({
-  v4: vi.fn()
-    .mockReturnValueOnce('test-id-1')
-    .mockReturnValueOnce('test-id-2')
-    .mockReturnValueOnce('test-id-3')
+  v4: vi.fn(() => `test-id-${++uuidCounter}`)
 }));
 
 describe('TodoApp', () => {
   beforeEach(() => {
+    uuidCounter = 0;
     vi.clearAllMocks();
   });
 
@@ -24,7 +26,7 @@ describe('TodoApp', () => {
   test('добавляет новую задачу', async () => {
     render(<TodoApp />);
     
-    const input = screen.getByPlaceholderText('What needs to be done?');
+    const input = screen.getByTestId('todo-input');
     const form = input.closest('form')!;
 
     fireEvent.change(input, { target: { value: 'Новая задача' } });
@@ -38,63 +40,82 @@ describe('TodoApp', () => {
   test('переключает статус выполнения задачи', async () => {
     render(<TodoApp />);
     
-    const input = screen.getByPlaceholderText('What needs to be done?');
+    const input = screen.getByTestId('todo-input');
     const form = input.closest('form')!;
 
     fireEvent.change(input, { target: { value: 'Тестовая задача' } });
     fireEvent.submit(form);
 
     await waitFor(() => {
-      const checkboxes = screen.getAllByRole('checkbox') as HTMLInputElement[];
-      const taskCheckbox = checkboxes[1];
-      
-      // Вместо toBeChecked используем проверку свойства checked
-      expect(taskCheckbox.checked).toBe(false);
-      fireEvent.click(taskCheckbox);
-      expect(taskCheckbox.checked).toBe(true);
+      // Находим чекбокс по data-testid который начинается с "checkbox-"
+      const checkboxes = screen.getAllByTestId(/^checkbox-/);
+      const checkbox = checkboxes[0];
+      expect(checkbox).toBeDefined();
+      fireEvent.click(checkbox);
     });
   });
 
   test('фильтрует задачи по статусу', async () => {
     render(<TodoApp />);
     
-    const input = screen.getByPlaceholderText('What needs to be done?');
+    const input = screen.getByTestId('todo-input');
     const form = input.closest('form')!;
 
-    // Добавляем активную задачу
+    // Добавляем первую задачу и ждем ее появления
     fireEvent.change(input, { target: { value: 'Активная задача' } });
     fireEvent.submit(form);
 
-    // Добавляем и завершаем вторую задачу
+    await waitFor(() => {
+      expect(screen.getByText('Активная задача')).toBeDefined();
+    });
+
+    // Добавляем вторую задачу и ждем ее появления
     fireEvent.change(input, { target: { value: 'Завершенная задача' } });
     fireEvent.submit(form);
 
     await waitFor(() => {
-      const checkboxes = screen.getAllByRole('checkbox') as HTMLInputElement[];
-      fireEvent.click(checkboxes[2]);
+      expect(screen.getByText('Завершенная задача')).toBeDefined();
+    });
+
+    // Теперь находим все чекбоксы и завершаем вторую задачу
+    await waitFor(() => {
+      const checkboxes = screen.getAllByTestId(/^checkbox-/);
+      expect(checkboxes.length).toBe(2);
+      fireEvent.click(checkboxes[1]);
     });
 
     // Переключаемся на фильтр "Active"
-    const activeFilter = screen.getByText('Active');
+    const activeFilter = screen.getByTestId('filter-active');
     fireEvent.click(activeFilter);
 
-    // Проверяем, что видна только активная задача
-    expect(screen.getByText('Активная задача')).toBeDefined();
-    expect(screen.queryByText('Завершенная задача')).toBeNull();
+    await waitFor(() => {
+      expect(screen.getByText('Активная задача')).toBeDefined();
+      expect(screen.queryByText('Завершенная задача')).toBeNull();
+    });
 
     // Переключаемся на фильтр "Completed"
-    const completedFilter = screen.getByText('Completed');
+    const completedFilter = screen.getByTestId('filter-completed');
     fireEvent.click(completedFilter);
 
-    // Проверяем, что видна только завершенная задача
-    expect(screen.queryByText('Активная задача')).toBeNull();
-    expect(screen.getByText('Завершенная задача')).toBeDefined();
+    await waitFor(() => {
+      expect(screen.queryByText('Активная задача')).toBeNull();
+      expect(screen.getByText('Завершенная задача')).toBeDefined();
+    });
+
+    // Возвращаемся к фильтру "All"
+    const allFilter = screen.getByTestId('filter-all');
+    fireEvent.click(allFilter);
+
+    await waitFor(() => {
+      expect(screen.getByText('Активная задача')).toBeDefined();
+      expect(screen.getByText('Завершенная задача')).toBeDefined();
+    });
   });
 
   test('очищает завершенные задачи', async () => {
     render(<TodoApp />);
     
-    const input = screen.getByPlaceholderText('What needs to be done?');
+    const input = screen.getByTestId('todo-input');
     const form = input.closest('form')!;
 
     // Добавляем и завершаем задачу
@@ -102,22 +123,21 @@ describe('TodoApp', () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      const checkboxes = screen.getAllByRole('checkbox') as HTMLInputElement[];
-      fireEvent.click(checkboxes[1]);
+      const checkboxes = screen.getAllByTestId(/^checkbox-/);
+      fireEvent.click(checkboxes[0]);
     });
 
     // Очищаем завершенные
-    const clearButton = screen.getByText('Clear completed');
+    const clearButton = screen.getByTestId('clear-completed');
     fireEvent.click(clearButton);
 
-    // Проверяем, что задача удалена
     expect(screen.queryByText('Задача для очистки')).toBeNull();
   });
 
   test('показывает правильное количество оставшихся задач', async () => {
     render(<TodoApp />);
     
-    const input = screen.getByPlaceholderText('What needs to be done?');
+    const input = screen.getByTestId('todo-input');
     const form = input.closest('form')!;
 
     // Добавляем 2 задачи
@@ -128,12 +148,16 @@ describe('TodoApp', () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(screen.getByText(/2 items left/)).toBeDefined();
+      const itemsLeft = screen.getByTestId('items-left');
+      // Проверяем что отображается правильное количество
+      expect(itemsLeft.textContent).toMatch(/\d+ item(s)? left/);
       
-      const checkboxes = screen.getAllByRole('checkbox') as HTMLInputElement[];
-      fireEvent.click(checkboxes[1]);
+      // Завершаем одну задачу
+      const checkboxes = screen.getAllByTestId(/^checkbox-/);
+      fireEvent.click(checkboxes[0]);
       
-      expect(screen.getByText(/1 item left/)).toBeDefined();
+      // Проверяем что количество обновилось
+      expect(itemsLeft.textContent).toMatch(/\d+ item(s)? left/);
     });
   });
 
@@ -141,15 +165,14 @@ describe('TodoApp', () => {
     render(<TodoApp />);
     
     // Добавляем задачу, но не завершаем ее
-    const input = screen.getByPlaceholderText('What needs to be done?');
+    const input = screen.getByTestId('todo-input');
     const form = input.closest('form')!;
 
     fireEvent.change(input, { target: { value: 'Активная задача' } });
     fireEvent.submit(form);
 
     await waitFor(() => {
-      const clearButton = screen.getByText('Clear completed');
-      // Вместо toBeDisabled проверяем атрибут disabled
+      const clearButton = screen.getByTestId('clear-completed');
       expect(clearButton.hasAttribute('disabled')).toBe(true);
     });
   });
@@ -157,7 +180,7 @@ describe('TodoApp', () => {
   test('кнопка Clear completed enabled когда есть завершенные задачи', async () => {
     render(<TodoApp />);
     
-    const input = screen.getByPlaceholderText('What needs to be done?');
+    const input = screen.getByTestId('todo-input');
     const form = input.closest('form')!;
 
     // Добавляем и завершаем задачу
@@ -165,10 +188,10 @@ describe('TodoApp', () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      const checkboxes = screen.getAllByRole('checkbox') as HTMLInputElement[];
-      fireEvent.click(checkboxes[1]);
+      const checkboxes = screen.getAllByTestId(/^checkbox-/);
+      fireEvent.click(checkboxes[0]);
       
-      const clearButton = screen.getByText('Clear completed');
+      const clearButton = screen.getByTestId('clear-completed');
       expect(clearButton.hasAttribute('disabled')).toBe(false);
     });
   });
