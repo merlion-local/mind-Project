@@ -3,7 +3,7 @@
  */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import TodoApp from './components/TodoApp/TodoApp';
+import TodoApp from './TodoApp';
 
 
 // Mock UUID - исправляем чтобы возвращал последовательные значения
